@@ -16,8 +16,6 @@ import {
   getDoc,
   getDocs,
   updateDoc,
-  query,
-  where
 } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
@@ -30,13 +28,15 @@ const PARK_COLORS = {
   'Disney Springs':    { bg: '#FDF4FF', text: '#6B21A8', dot: '#A855F7' },
 };
 
+const PRICE_ORDER = { '$': 1, '$$': 2, '$$$': 3 };
+
 const CATEGORY_ICONS = {
   Snack:   '🍿',
   Meal:    '🍽️',
   Dessert: '🍰',
   Drink:   '🥤',
 };
-
+ 
 // ── Helpers ───────────────────────────────────────────────────
 function StarRating({ rating, size = 14 }) {
   return (
@@ -298,8 +298,6 @@ function MainContent({ items, currentUser, onRate, userRatings, userLikes, wantT
   const [selectedPrice, setSelectedPrice]       = useState('All');
   const [sortBy, setSortBy]                     = useState('highest');
   const [selectedItem, setSelectedItem]         = useState(null);
-
-  const PRICE_ORDER = { '$': 1, '$$': 2, '$$$': 3 };
 
   const filtered = useMemo(() => {
     let result = [...items];
@@ -573,7 +571,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => { loadItems(); }, []);
+  useEffect(() => { loadItems(); }, [loadItems]); // eslint-disable-line
 
   const loadItems = async () => {
     try {
