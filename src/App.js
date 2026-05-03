@@ -571,7 +571,7 @@ function App() {
     return () => unsubscribe();
   }, []);
 
-  useEffect(() => { loadItems(); }, [loadItems]); // eslint-disable-line
+  useEffect(() => { loadItems(); }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const loadItems = async () => {
     try {
