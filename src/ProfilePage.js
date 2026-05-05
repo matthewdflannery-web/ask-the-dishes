@@ -1,0 +1,264 @@
+import { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { db } from './firebase';
+
+export default function ProfilePage({ currentUser }) {
+  const navigate = useNavigate();
+  const [reviews, setReviews] = useState([]);
+  const [wantToTry, setWantToTry] = useState([]);
+  const [activeTab, setActiveTab] = useState('reviews');
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!currentUser) {
+      navigate('/');
+      return;
+    }
+    loadProfileData();
+  }, [currentUser]);
+
+  async function loadProfileData() {
+    setLoading(true);
+    try {
+      const reviewsRef = collection(db, 'ratings');
+      const reviewsSnap = await getDocs(query(reviewsRef, orderBy('timestamp', 'desc')));
+      const reviewsList = reviewsSnap.docs
+        .map(d => ({ id: d.id, ...d.data() }))
+        .filter(r => r.userId === currentUser.uid);
+      setReviews(reviewsList);
+      const wttRef = collection(db, 'users', currentUser.uid, 'wantToTry');
+      const wttSnap = await getDocs(wttRef);
+      const wttList = wttSnap.docs.map(d => ({ id: d.id, ...d.data() }));
+      setWantToTry(wttList);
+    } catch (err) {
+      console.error('Error loading profile:', err);
+    }
+    setLoading(false);
+  }
+
+  function getInitials(user) {
+    if (!user) return '?';
+    if (user.displayName) {
+      return user.displayName.split(' ').map(n => n[0]).join('').toUpperCase();
+    }
+    return user.email?.[0]?.toUpperCase() || '?';
+  }
+
+  function getDisplayName(user) {
+    if (!user) return 'Guest';
+    return user.displayName || user.email?.split('@')[0] || 'Disney Fan';
+  }
+
+  function renderStars(rating) {
+    return '\u2605'.repeat(Math.round(rating)) + '\u2606'.repeat(5 - Math.round(rating));
+  }
+
+  const styles = {
+    page: {
+      minHeight: '100vh',
+      background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0d1117 100%)',
+      color: '#e8e8e8',
+      fontFamily: "'Crimson Pro', Georgia, serif",
+      padding: '20px',
+    },
+    backBtn: {
+      background: 'none',
+      border: '1px solid #c9a84c',
+      color: '#c9a84c',
+      padding: '8px 16px',
+      borderRadius: '20px',
+      cursor: 'pointer',
+      fontFamily: "'Cinzel', serif",
+      fontSize: '0.75rem',
+      marginBottom: '24px',
+    },
+    avatarCircle: {
+      width: '80px',
+      height: '80px',
+      borderRadius: '50%',
+      background: 'linear-gradient(135deg, #c9a84c, #8b6914)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '2rem',
+      fontFamily: "'Cinzel', serif",
+      color: '#0a0a1a',
+      fontWeight: 'bold',
+      margin: '0 auto 12px',
+      border: '3px solid #c9a84c',
+    },
+    displayName: {
+      textAlign: 'center',
+      fontFamily: "'Cinzel', serif",
+      fontSize: '1.4rem',
+      color: '#c9a84c',
+      marginBottom: '4px',
+    },
+    joinDate: {
+      textAlign: 'center',
+      fontSize: '0.85rem',
+      color: '#888',
+      marginBottom: '24px',
+    },
+    statsRow: {
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '32px',
+      marginBottom: '32px',
+    },
+    statBox: { textAlign: 'center' },
+    statNumber: {
+      fontSize: '1.8rem',
+      fontFamily: "'Cinzel', serif",
+      color: '#c9a84c',
+      display: 'block',
+    },
+    statLabel: {
+      fontSize: '0.75rem',
+      color: '#888',
+      textTransform: 'uppercase',
+      letterSpacing: '1px',
+    },
+    tabs: {
+      display: 'flex',
+      justifyContent: 'center',
+      gap: '8px',
+      marginBottom: '24px',
+    },
+    tab: {
+      padding: '8px 20px',
+      borderRadius: '20px',
+      border: '1px solid #333',
+      background: 'none',
+      color: '#888',
+      cursor: 'pointer',
+      fontFamily: "'Cinzel', serif",
+      fontSize: '0.75rem',
+    },
+    activeTab: {
+      padding: '8px 20px',
+      borderRadius: '20px',
+      border: '1px solid #c9a84c',
+      background: 'rgba(201,168,76,0.15)',
+      color: '#c9a84c',
+      cursor: 'pointer',
+      fontFamily: "'Cinzel', serif",
+      fontSize: '0.75rem',
+    },
+    card: {
+      background: 'rgba(255,255,255,0.04)',
+      border: '1px solid rgba(201,168,76,0.2)',
+      borderRadius: '12px',
+      padding: '16px',
+      maxWidth: '600px',
+      margin: '0 auto 12px',
+    },
+    cardTitle: {
+      fontFamily: "'Cinzel', serif",
+      color: '#c9a84c',
+      fontSize: '1rem',
+      marginBottom: '4px',
+    },
+    cardPark: {
+      fontSize: '0.8rem',
+      color: '#888',
+      marginBottom: '8px',
+    },
+    cardStars: {
+      color: '#c9a84c',
+      fontSize: '1rem',
+      marginBottom: '6px',
+    },
+    cardReview: {
+      fontSize: '0.95rem',
+      color: '#ccc',
+      fontStyle: 'italic',
+    },
+    emptyState: {
+      textAlign: 'center',
+      color: '#888',
+      padding: '40px 20px',
+      fontSize: '1rem',
+    },
+  };
+
+  if (loading) {
+    return (
+      <div style={{ ...styles.page, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ color: '#c9a84c', fontFamily: "'Cinzel', serif", fontSize: '1.2rem' }}>
+          Loading your profile...
+        </div>
+      </div>
+    );
+  }
+
+  const avgRating = reviews.length > 0
+    ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1)
+    : '--';
+
+  const joinDate = currentUser?.metadata?.creationTime
+    ? new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+    : 'Disney Fan';
+
+  return (
+    <div style={styles.page}>
+      <button style={styles.backBtn} onClick={() => navigate('/')}>Back to Browse</button>
+      <div style={styles.avatarCircle}>{getInitials(currentUser)}</div>
+      <div style={styles.displayName}>{getDisplayName(currentUser)}</div>
+      <div style={styles.joinDate}>Member since {joinDate}</div>
+      <div style={styles.statsRow}>
+        <div style={styles.statBox}>
+          <span style={styles.statNumber}>{reviews.length}</span>
+          <span style={styles.statLabel}>Reviews</span>
+        </div>
+        <div style={styles.statBox}>
+          <span style={styles.statNumber}>{avgRating}</span>
+          <span style={styles.statLabel}>Avg Rating</span>
+        </div>
+        <div style={styles.statBox}>
+          <span style={styles.statNumber}>{wantToTry.length}</span>
+          <span style={styles.statLabel}>Want To Try</span>
+        </div>
+      </div>
+      <div style={styles.tabs}>
+        <button style={activeTab === 'reviews' ? styles.activeTab : styles.tab} onClick={() => setActiveTab('reviews')}>
+          Reviews
+        </button>
+        <button style={activeTab === 'wantToTry' ? styles.activeTab : styles.tab} onClick={() => setActiveTab('wantToTry')}>
+          Want To Try
+        </button>
+      </div>
+      {activeTab === 'reviews' && (
+        <div>
+          {reviews.length === 0 ? (
+            <div style={styles.emptyState}>No reviews yet -- go taste something magical!</div>
+          ) : (
+            reviews.map(review => (
+              <div key={review.id} style={styles.card}>
+                <div style={styles.cardTitle}>{review.id.replace(currentUser.uid + '_', '')}</div>
+                <div style={styles.cardPark}>{review.timestamp ? new Date(review.timestamp).toLocaleDateString() : ''}</div>
+                <div style={styles.cardStars}>{renderStars(review.rating || 0)}</div>
+                {review.review && <div style={styles.cardReview}>{review.review}</div>}
+              </div>
+            ))
+          )}
+        </div>
+      )}
+      {activeTab === 'wantToTry' && (
+        <div>
+          {wantToTry.length === 0 ? (
+            <div style={styles.emptyState}>Nothing saved yet -- bookmark items you want to try!</div>
+          ) : (
+            wantToTry.map(item => (
+              <div key={item.id} style={styles.card}>
+                <div style={styles.cardTitle}>{item.name || item.id}</div>
+                <div style={styles.cardPark}>{item.park || ''}</div>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+    </div>
+  );
+}

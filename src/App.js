@@ -1,4 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
+import ProfilePage from './ProfilePage';
 import { LogOut } from 'lucide-react';
 
 // Firebase imports
@@ -542,7 +544,7 @@ function Header({ onSignOut }) {
 }
 
 // ── App ───────────────────────────────────────────────────────
-function App() {
+function MainApp() {
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading]         = useState(true);
   const [showAuth, setShowAuth]       = useState(true);
@@ -698,22 +700,36 @@ function App() {
   if (showAuth) {
     return <AuthScreen onSignIn={handleSignIn} onSignUp={handleSignUp} />;
   }
+return (
+    <Routes>
+      <Route path="/profile" element={<ProfilePage currentUser={currentUser} />} />
+      <Route path="/" element={
+        <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
+          <Header onSignOut={handleSignOut} />
+          <MainContent
+            items={items}
+            currentUser={currentUser}
+            onRate={handleRate}
+            userRatings={userRatings}
+            userLikes={userLikes}
+            wantToTry={wantToTry}
+            parks={parks}
+            categories={categories}
+            priceRanges={priceRanges}
+          />
+        </div>
+      } />
+    </Routes>
+  );
+}
 
+function App() {
   return (
-    <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
-      <Header onSignOut={handleSignOut} />
-      <MainContent
-        items={items}
-        currentUser={currentUser}
-        onRate={handleRate}
-        userRatings={userRatings}
-        userLikes={userLikes}
-        wantToTry={wantToTry}
-        parks={parks}
-        categories={categories}
-        priceRanges={priceRanges}
-      />
-    </div>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/*" element={<MainApp />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
