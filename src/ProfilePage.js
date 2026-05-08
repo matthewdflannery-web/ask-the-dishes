@@ -16,6 +16,7 @@ export default function ProfilePage({ currentUser }) {
       return;
     }
     loadProfileData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
   async function loadProfileData() {
@@ -27,6 +28,7 @@ export default function ProfilePage({ currentUser }) {
         .map(d => ({ id: d.id, ...d.data() }))
         .filter(r => r.userId === currentUser.uid);
       setReviews(reviewsList);
+
       const wttRef = collection(db, 'users', currentUser.uid, 'wantToTry');
       const wttSnap = await getDocs(wttRef);
       const wttList = wttSnap.docs.map(d => ({ id: d.id, ...d.data() }));
@@ -51,7 +53,7 @@ export default function ProfilePage({ currentUser }) {
   }
 
   function renderStars(rating) {
-    return '\u2605'.repeat(Math.round(rating)) + '\u2606'.repeat(5 - Math.round(rating));
+    return '★'.repeat(Math.round(rating)) + '☆'.repeat(5 - Math.round(rating));
   }
 
   const styles = {
@@ -107,7 +109,9 @@ export default function ProfilePage({ currentUser }) {
       gap: '32px',
       marginBottom: '32px',
     },
-    statBox: { textAlign: 'center' },
+    statBox: {
+      textAlign: 'center',
+    },
     statNumber: {
       fontSize: '1.8rem',
       fontFamily: "'Cinzel', serif",
@@ -151,6 +155,7 @@ export default function ProfilePage({ currentUser }) {
       border: '1px solid rgba(201,168,76,0.2)',
       borderRadius: '12px',
       padding: '16px',
+      marginBottom: '12px',
       maxWidth: '600px',
       margin: '0 auto 12px',
     },
@@ -187,7 +192,7 @@ export default function ProfilePage({ currentUser }) {
     return (
       <div style={{ ...styles.page, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
         <div style={{ color: '#c9a84c', fontFamily: "'Cinzel', serif", fontSize: '1.2rem' }}>
-          Loading your profile...
+          ✨ Loading your profile...
         </div>
       </div>
     );
@@ -195,7 +200,7 @@ export default function ProfilePage({ currentUser }) {
 
   const avgRating = reviews.length > 0
     ? (reviews.reduce((sum, r) => sum + (r.rating || 0), 0) / reviews.length).toFixed(1)
-    : '--';
+    : '—';
 
   const joinDate = currentUser?.metadata?.creationTime
     ? new Date(currentUser.metadata.creationTime).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
@@ -203,10 +208,12 @@ export default function ProfilePage({ currentUser }) {
 
   return (
     <div style={styles.page}>
-      <button style={styles.backBtn} onClick={() => navigate('/')}>Back to Browse</button>
+      <button style={styles.backBtn} onClick={() => navigate('/')}>← Back to Browse</button>
+
       <div style={styles.avatarCircle}>{getInitials(currentUser)}</div>
       <div style={styles.displayName}>{getDisplayName(currentUser)}</div>
       <div style={styles.joinDate}>Member since {joinDate}</div>
+
       <div style={styles.statsRow}>
         <div style={styles.statBox}>
           <span style={styles.statNumber}>{reviews.length}</span>
@@ -221,34 +228,51 @@ export default function ProfilePage({ currentUser }) {
           <span style={styles.statLabel}>Want To Try</span>
         </div>
       </div>
+
       <div style={styles.tabs}>
-        <button style={activeTab === 'reviews' ? styles.activeTab : styles.tab} onClick={() => setActiveTab('reviews')}>
+        <button
+          style={activeTab === 'reviews' ? styles.activeTab : styles.tab}
+          onClick={() => setActiveTab('reviews')}
+        >
           Reviews
         </button>
-        <button style={activeTab === 'wantToTry' ? styles.activeTab : styles.tab} onClick={() => setActiveTab('wantToTry')}>
+        <button
+          style={activeTab === 'wantToTry' ? styles.activeTab : styles.tab}
+          onClick={() => setActiveTab('wantToTry')}
+        >
           Want To Try
         </button>
       </div>
+
       {activeTab === 'reviews' && (
         <div>
           {reviews.length === 0 ? (
-            <div style={styles.emptyState}>No reviews yet -- go taste something magical!</div>
+            <div style={styles.emptyState}>
+              🍽️ No reviews yet — go taste something magical!
+            </div>
           ) : (
             reviews.map(review => (
               <div key={review.id} style={styles.card}>
-                <div style={styles.cardTitle}>{review.id.replace(currentUser.uid + '_', '')}</div>
-                <div style={styles.cardPark}>{review.timestamp ? new Date(review.timestamp).toLocaleDateString() : ''}</div>
+                <div style={styles.cardTitle}>
+                  {review.id.replace(currentUser.uid + '_', '')}
+                </div>
+                <div style={styles.cardPark}>
+                  {review.timestamp ? new Date(review.timestamp).toLocaleDateString() : ''}
+                </div>
                 <div style={styles.cardStars}>{renderStars(review.rating || 0)}</div>
-                {review.review && <div style={styles.cardReview}>{review.review}</div>}
+                {review.review && <div style={styles.cardReview}>"{review.review}"</div>}
               </div>
             ))
           )}
         </div>
       )}
+
       {activeTab === 'wantToTry' && (
         <div>
           {wantToTry.length === 0 ? (
-            <div style={styles.emptyState}>Nothing saved yet -- bookmark items you want to try!</div>
+            <div style={styles.emptyState}>
+              🌟 Nothing saved yet — bookmark items you want to try!
+            </div>
           ) : (
             wantToTry.map(item => (
               <div key={item.id} style={styles.card}>

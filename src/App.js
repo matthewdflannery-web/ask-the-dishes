@@ -1,4 +1,5 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo } from 'react'
+import { createPortal } from 'react-dom';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import ProfilePage from './ProfilePage';
 import { LogOut } from 'lucide-react';
@@ -186,9 +187,9 @@ function ItemDetailModal({ item, currentUser, userRatings, onRate, onClose }) {
       }}
     >
       <div style={{
-        background: 'var(--color-background-primary)',
+        background: '#1a1a2e',
         borderRadius: 16,
-        border: '0.5px solid var(--color-border-tertiary)',
+        border: '0.5px solid rgba(255,255,255,0.1)',
         width: '100%', maxWidth: 480,
         maxHeight: '90vh', overflowY: 'auto',
       }}>
@@ -212,12 +213,12 @@ function ItemDetailModal({ item, currentUser, userRatings, onRate, onClose }) {
 
         <div style={{ padding: '20px 20px 24px' }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 }}>
-            <h2 style={{ fontSize: 22, fontWeight: 500, margin: 0, color: 'var(--color-text-primary)' }}>{item.name}</h2>
+            <h2 style={{ fontSize: 22, fontWeight: 500, margin: 0, color: '#ffffff' }}>{item.name}</h2>
             <span style={{ fontSize: 15, fontWeight: 500, color: 'var(--color-text-secondary)' }}>{item.price}</span>
           </div>
-          <p style={{ fontSize: 13, color: 'var(--color-text-secondary)', margin: '0 0 8px' }}>📍 {item.location}</p>
+          <p style={{ fontSize: 13, color: '#a0aec0', margin: '0 0 8px' }}>📍 {item.location}</p>
           <ParkBadge park={item.park} />
-          <p style={{ fontSize: 14, color: 'var(--color-text-secondary)', margin: '12px 0', lineHeight: 1.6 }}>{item.description}</p>
+          <p style={{ fontSize: 14, color: '#cbd5e0', margin: '12px 0', lineHeight: 1.6 }}>{item.description}</p>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 8, margin: '12px 0' }}>
             <StarRating rating={item.avgRating || 0} size={16} />
@@ -241,7 +242,7 @@ function ItemDetailModal({ item, currentUser, userRatings, onRate, onClose }) {
 
           {currentUser && (
             <div style={{ borderTop: '0.5px solid var(--color-border-tertiary)', paddingTop: 16, marginTop: 4 }}>
-              <p style={{ fontSize: 13, fontWeight: 500, margin: '0 0 8px', color: 'var(--color-text-primary)' }}>
+              <p style={{ fontSize: 13, fontWeight: 500, margin: '0 0 8px', color: '#ffffff' }}>
                 {submitted ? '✓ Rating saved!' : 'Rate this dish'}
               </p>
               {!submitted && (
@@ -431,15 +432,14 @@ function MainContent({ items, currentUser, onRate, userRatings, userLikes, wantT
       </div>
 
       {/* Detail modal */}
-      {selectedItem && (
+      {selectedItem && createPortal(
         <ItemDetailModal
           item={selectedItem}
           currentUser={currentUser}
           userRatings={userRatings}
           onRate={onRate}
           onClose={() => setSelectedItem(null)}
-        />
-      )}
+        />, document.body)}
     </div>
   );
 }
