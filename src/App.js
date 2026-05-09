@@ -167,11 +167,13 @@ function ItemDetailModal({ item, currentUser, userRatings, onRate, onClose }) {
   const [review, setReview]     = useState(userRatings?.[item.id]?.review || '');
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted]   = useState(false);
+  const [photoFile, setPhotoFile]   = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
 
   const handleSubmit = async () => {
     if (!rating) return;
     setSubmitting(true);
-    await onRate(item.id, rating, review, null);
+    await onRate(item.id, rating, review, photoFile);
     setSubmitting(false);
     setSubmitted(true);
   };
@@ -269,6 +271,40 @@ function ItemDetailModal({ item, currentUser, userRatings, onRate, onClose }) {
                     rows={2}
                     style={{ width: '100%', boxSizing: 'border-box', resize: 'vertical', fontSize: 13 }}
                   />
+                  <div style={{ marginTop: 10 }}>
+                    <label style={{
+                      display: 'inline-flex', alignItems: 'center', gap: 6,
+                      cursor: 'pointer', fontSize: 13, color: '#a0aec0',
+                      background: 'rgba(255,255,255,0.07)', border: '0.5px solid rgba(255,255,255,0.15)',
+                      borderRadius: 8, padding: '6px 12px',
+                    }}>
+                      📷 {photoFile ? 'Change photo' : 'Add a photo'}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        style={{ display: 'none' }}
+                        onChange={e => {
+                          const file = e.target.files[0];
+                          if (!file) return;
+                          setPhotoFile(file);
+                          setPhotoPreview(URL.createObjectURL(file));
+                        }}
+                      />
+                    </label>
+                    {photoFile && (
+                      <button
+                        onClick={() => { setPhotoFile(null); setPhotoPreview(null); }}
+                        style={{ marginLeft: 8, background: 'none', border: 'none', color: '#fc8181', cursor: 'pointer', fontSize: 12 }}
+                      >Remove</button>
+                    )}
+                  </div>
+                  {photoPreview && (
+                    <img
+                      src={photoPreview}
+                      alt="Preview"
+                      style={{ marginTop: 10, width: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 8 }}
+                    />
+                  )}
                   <button
                     onClick={handleSubmit}
                     disabled={!rating || submitting}
