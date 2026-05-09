@@ -94,7 +94,7 @@ function ItemCard({ item, userRatings, userLikes, onSelect }) {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 64, position: 'relative', overflow: 'hidden',
       }}>
-        {item.photoUrl
+{item.photoUrl
           ? <img src={item.photoUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           : <span>{item.image || CATEGORY_ICONS[item.category] || '🍴'}</span>
         }
@@ -169,6 +169,22 @@ function ItemDetailModal({ item, currentUser, userRatings, onRate, onClose }) {
   const [submitted, setSubmitted]   = useState(false);
   const [photoFile, setPhotoFile]   = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
+  const [communityPhotos, setCommunityPhotos] = useState([]);
+
+  useEffect(() => {
+    const loadPhotos = async () => {
+      try {
+        const snap = await getDocs(collection(db, 'ratings'));
+        const photos = snap.docs
+          .map(d => d.data())
+          .filter(d => d.itemId === item.id && d.photo);
+        setCommunityPhotos(photos);
+      } catch (e) {
+        console.error('Error loading photos:', e);
+      }
+    };
+    loadPhotos();
+  }, [item.id]);
 
   const handleSubmit = async () => {
     if (!rating) return;
@@ -323,6 +339,23 @@ function ItemDetailModal({ item, currentUser, userRatings, onRate, onClose }) {
               )}
             </div>
           )}
+        {communityPhotos.length > 0 && (
+          <div style={{ borderTop: '0.5px solid var(--color-border-tertiary)', paddingTop: 16, marginTop: 8 }}>
+            <p style={{ fontSize: 13, fontWeight: 500, margin: '0 0 10px', color: '#ffffff' }}>
+              📷 Community Photos ({communityPhotos.length})
+            </p>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: 6 }}>
+              {communityPhotos.map((p, i) => (
+                <img
+                  key={i}
+                  src={p.photo}
+                  alt="Community photo"
+                  style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 8 }}
+                />
+              ))}
+            </div>
+          </div>
+        )}
         </div>
       </div>
     </div>
@@ -671,7 +704,7 @@ function MainApp() {
         await uploadBytes(storageRef, photoFile);
         photoUrl = await getDownloadURL(storageRef);
       }
-      const ratingData = { rating, review, photo: photoUrl, timestamp: new Date().toISOString(), userId: currentUser };
+      const ratingData = { rating, review, photo: photoUrl, timestamp: new Date().toISOString(), userId: currentUser, itemId };
       await setDoc(doc(db, 'ratings', `${currentUser}_${itemId}`), ratingData);
       const newRatings = { ...userRatings, [itemId]: ratingData };
       setUserRatings(newRatings);
