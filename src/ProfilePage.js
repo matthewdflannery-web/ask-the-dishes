@@ -240,7 +240,7 @@ export default function ProfilePage({ currentUser }) {
           <button onClick={() => setEditingName(false)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.8rem', marginLeft: 6 }}>Cancel</button>
         </div>
       ) : (
-        <div style={{ ...styles.displayName, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8, fontFamily: "'Cinzel', serif", fontSize: '1.4rem', color: '#c9a84c', marginBottom: '4px' }}>
           {profileName || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Disney Fan'}
           <button onClick={() => { setNameInput(profileName || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Disney Fan'); setEditingName(true); }} style={{ background: 'none', border: 'none', color: '#c9a84c', cursor: 'pointer', fontSize: '1rem', padding: 0 }}>edit</button>
         </div>
