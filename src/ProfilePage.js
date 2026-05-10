@@ -44,13 +44,6 @@ export default function ProfilePage({ currentUser }) {
     setLoading(false);
   }
 
-  function getInitials(user) {
-    if (!user) return '?';
-    if (user.displayName) {
-      return user.displayName.split(' ').map(n => n[0]).join('').toUpperCase();
-    }
-    return user.email?.[0]?.toUpperCase() || '?';
-  }
 
 
   async function saveName() {

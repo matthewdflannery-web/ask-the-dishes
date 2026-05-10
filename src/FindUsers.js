@@ -13,6 +13,7 @@ export default function FindUsers({ currentUser }) {
   useEffect(() => {
     if (!currentUser) { navigate('/'); return; }
     loadUsers();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
   async function loadUsers() {
