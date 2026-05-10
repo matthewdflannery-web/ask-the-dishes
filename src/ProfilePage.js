@@ -242,7 +242,7 @@ export default function ProfilePage({ currentUser }) {
       ) : (
         <div style={{ ...styles.displayName, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
           {profileName || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Disney Fan'}
-          <button onClick={() => { setNameInput(profileName || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Disney Fan'); setEditingName(true); }} style={{ background: 'none', border: 'none', color: '#c9a84c', cursor: 'pointer', fontSize: '1rem', padding: 0 }}>✏️</button>
+          <button onClick={() => { setNameInput(profileName || currentUser?.displayName || currentUser?.email?.split('@')[0] || 'Disney Fan'); setEditingName(true); }} style={{ background: 'none', border: 'none', color: '#c9a84c', cursor: 'pointer', fontSize: '1rem', padding: 0 }}>edit</button>
         </div>
       )}
       <div style={styles.joinDate}>Member since {joinDate}</div>
