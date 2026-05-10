@@ -624,7 +624,7 @@ function MainApp() {
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (user) => {
       if (user) {
-        setCurrentUser(user.uid);
+        setCurrentUser(user);
         setShowAuth(false);
         loadUserData(user.uid);
       } else {
@@ -690,19 +690,19 @@ function MainApp() {
   };
 
   const handleRate = async (itemId, rating, review, photoFile) => {
-    if (!currentUser) return;
+    if (!currentUser?.uid) return;
     try {
       let photoUrl = null;
       if (photoFile) {
-        const storageRef = ref(storage, `food-photos/${currentUser}/${itemId}-${Date.now()}`);
+        const storageRef = ref(storage, `food-photos/${currentUser.uid}/${itemId}-${Date.now()}`);
         await uploadBytes(storageRef, photoFile);
         photoUrl = await getDownloadURL(storageRef);
       }
-      const ratingData = { rating, review, photo: photoUrl, timestamp: new Date().toISOString(), userId: currentUser, itemId };
-      await setDoc(doc(db, 'ratings', `${currentUser}_${itemId}`), ratingData);
+      const ratingData = { rating, review, photo: photoUrl, timestamp: new Date().toISOString(), userId: currentUser.uid, itemId };
+      await setDoc(doc(db, 'ratings', `${currentUser.uid}_${itemId}`), ratingData);
       const newRatings = { ...userRatings, [itemId]: ratingData };
       setUserRatings(newRatings);
-      await updateDoc(doc(db, 'users', currentUser), {
+      await updateDoc(doc(db, 'users', currentUser.uid), {
         [`ratings.${itemId}`]: ratingData,
         totalCheckins: Object.keys(newRatings).length,
       });
