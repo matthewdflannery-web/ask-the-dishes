@@ -51,10 +51,6 @@ export default function ProfilePage({ currentUser }) {
     return user.email?.[0]?.toUpperCase() || '?';
   }
 
-  function getDisplayName(user) {
-    if (!user) return 'Guest';
-    return user.displayName || user.email?.split('@')[0] || 'Disney Fan';
-  }
 
   async function saveName() {
     if (!nameInput.trim()) return;
