@@ -349,7 +349,7 @@ function ItemDetailModal({ item, currentUser, userRatings, onRate, onClose }) {
                 <img
                   key={i}
                   src={p.photo}
-                  alt="Community photo"
+                  alt="User submitted food photo"
                   style={{ width: '100%', aspectRatio: '1', objectFit: 'cover', borderRadius: 8 }}
                 />
               ))}
