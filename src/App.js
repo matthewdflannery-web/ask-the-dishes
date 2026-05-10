@@ -94,10 +94,7 @@ function ItemCard({ item, userRatings, userLikes, onSelect }) {
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 64, position: 'relative', overflow: 'hidden',
       }}>
-{item.photoUrl
-          ? <img src={item.photoUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-          : <span>{item.image || CATEGORY_ICONS[item.category] || '🍴'}</span>
-        }
+<span>{CATEGORY_ICONS[item.category] || '🍴'}</span>
         <span style={{
           position: 'absolute', top: 10, right: 10,
           background: 'rgba(0,0,0,0.55)', color: '#fff',
@@ -217,10 +214,7 @@ function ItemDetailModal({ item, currentUser, userRatings, onRate, onClose }) {
           fontSize: 80, position: 'relative', overflow: 'hidden',
           borderRadius: '16px 16px 0 0',
         }}>
-          {item.photoUrl
-            ? <img src={item.photoUrl} alt={item.name} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-            : item.image || CATEGORY_ICONS[item.category] || '🍴'
-          }
+          {CATEGORY_ICONS[item.category] || '🍴'}
           <button onClick={onClose} style={{
             position: 'absolute', top: 12, right: 12,
             background: 'rgba(0,0,0,0.5)', border: 'none', borderRadius: '50%',
