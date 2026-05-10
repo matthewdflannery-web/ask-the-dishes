@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { collection, getDocs, query, orderBy } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, doc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
 export default function ProfilePage({ currentUser }) {
@@ -9,6 +9,9 @@ export default function ProfilePage({ currentUser }) {
   const [wantToTry, setWantToTry] = useState([]);
   const [activeTab, setActiveTab] = useState('reviews');
   const [loading, setLoading] = useState(true);
+  const [editingName, setEditingName] = useState(false);
+  const [nameInput, setNameInput] = useState('');
+  const [displayName, setDisplayName] = useState('');
 
   useEffect(() => {
     if (!currentUser) {
@@ -16,6 +19,7 @@ export default function ProfilePage({ currentUser }) {
       return;
     }
     loadProfileData();
+    setDisplayName(currentUser.displayName || currentUser.email?.split('@')[0] || 'Disney Fan');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
@@ -50,6 +54,17 @@ export default function ProfilePage({ currentUser }) {
   function getDisplayName(user) {
     if (!user) return 'Guest';
     return user.displayName || user.email?.split('@')[0] || 'Disney Fan';
+  }
+
+  async function saveName() {
+    if (!nameInput.trim()) return;
+    try {
+      await updateDoc(doc(db, 'users', currentUser.uid), { displayName: nameInput.trim() });
+      setDisplayName(nameInput.trim());
+      setEditingName(false);
+    } catch (err) {
+      console.error('Error saving name:', err);
+    }
   }
 
   function renderStars(rating) {
@@ -213,7 +228,23 @@ export default function ProfilePage({ currentUser }) {
       <button style={styles.backBtn} onClick={() => navigate('/')}>← Back to Browse</button>
 
       <div style={styles.avatarCircle}>{getInitials(currentUser)}</div>
-      <div style={styles.displayName}>{getDisplayName(currentUser)}</div>
+      {editingName ? (
+        <div style={{ textAlign: 'center', marginBottom: '4px' }}>
+          <input
+            value={nameInput}
+            onChange={e => setNameInput(e.target.value)}
+            style={{ fontFamily: "'Cinzel', serif", fontSize: '1rem', padding: '6px 12px', borderRadius: 8, border: '1px solid #c9a84c', background: 'rgba(255,255,255,0.08)', color: '#c9a84c', textAlign: 'center', marginRight: 8 }}
+            autoFocus
+          />
+          <button onClick={saveName} style={{ background: '#c9a84c', color: '#0a0a1a', border: 'none', borderRadius: 8, padding: '6px 14px', cursor: 'pointer', fontWeight: 600, fontSize: '0.8rem' }}>Save</button>
+          <button onClick={() => setEditingName(false)} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.8rem', marginLeft: 6 }}>Cancel</button>
+        </div>
+      ) : (
+        <div style={{ ...styles.displayName, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
+          {displayName}
+          <button onClick={() => { setNameInput(displayName); setEditingName(true); }} style={{ background: 'none', border: 'none', color: '#888', cursor: 'pointer', fontSize: '0.9rem', padding: 0 }}>✏️</button>
+        </div>
+      )}
       <div style={styles.joinDate}>Member since {joinDate}</div>
 
       <div style={styles.statsRow}>
