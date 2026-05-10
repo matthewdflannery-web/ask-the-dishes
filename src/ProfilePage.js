@@ -225,7 +225,7 @@ export default function ProfilePage({ currentUser }) {
     <div style={styles.page}>
       <button style={styles.backBtn} onClick={() => navigate('/')}>← Back to Browse</button>
 
-      <div style={styles.avatarCircle}>{getInitials(currentUser)}</div>
+      <div style={styles.avatarCircle}>{profileName ? profileName[0].toUpperCase() : currentUser?.email?.[0]?.toUpperCase() || '?'}</div>
       {editingName ? (
         <div style={{ textAlign: 'center', marginBottom: '4px' }}>
           <input
