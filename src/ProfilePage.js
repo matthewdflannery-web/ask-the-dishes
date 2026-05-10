@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { updateProfile } from 'firebase/auth';
 import { collection, getDocs, query, orderBy, doc, updateDoc } from 'firebase/firestore';
 import { db } from './firebase';
 
@@ -55,6 +56,7 @@ export default function ProfilePage({ currentUser }) {
   async function saveName() {
     if (!nameInput.trim()) return;
     try {
+      await updateProfile(currentUser, { displayName: nameInput.trim() });
       await updateDoc(doc(db, 'users', currentUser.uid), { displayName: nameInput.trim() });
       setProfileName(nameInput.trim());
       setEditingName(false);
