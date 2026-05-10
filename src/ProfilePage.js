@@ -158,6 +158,8 @@ export default function ProfilePage({ currentUser }) {
       marginBottom: '12px',
       maxWidth: '600px',
       margin: '0 auto 12px',
+      boxSizing: 'border-box',
+      width: '100%',
     },
     cardTitle: {
       fontFamily: "'Cinzel', serif",
@@ -254,7 +256,7 @@ export default function ProfilePage({ currentUser }) {
             reviews.map(review => (
               <div key={review.id} style={styles.card}>
                 <div style={styles.cardTitle}>
-                  {review.id.replace(currentUser.uid + '_', '')}
+                  {review.itemName || review.itemId || 'Unknown Dish'}
                 </div>
                 <div style={styles.cardPark}>
                   {review.timestamp ? new Date(review.timestamp).toLocaleDateString() : ''}
