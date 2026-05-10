@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import ProfilePage from './ProfilePage';
 import { LogOut } from 'lucide-react';
 
@@ -583,7 +583,7 @@ function AuthScreen({ onSignIn, onSignUp }) {
 }
 
 // ── Header ────────────────────────────────────────────────────
-function Header({ onSignOut }) {
+function Header({ onSignOut, onProfile }) {
   return (
     <>
       <style>{`
@@ -593,13 +593,10 @@ function Header({ onSignOut }) {
       <header style={{ background: 'linear-gradient(90deg, #7C3AED, #2563EB)', color: 'white', boxShadow: '0 2px 8px rgba(0,0,0,0.15)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', padding: '16px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
           <h1 className="disney-title" style={{ fontSize: 32, margin: 0 }}>🏰 Ask The Dishes</h1>
-          <button onClick={onSignOut} style={{
-            background: 'white', color: '#7C3AED', padding: '8px 16px',
-            borderRadius: 8, border: 'none', fontWeight: 600, cursor: 'pointer',
-            display: 'flex', alignItems: 'center', gap: 6, fontSize: 14,
-          }}>
-            <LogOut size={16} /> Sign Out
-          </button>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button onClick={onProfile} style={{ background: 'rgba(255,255,255,0.15)', color: 'white', padding: '8px 16px', borderRadius: 8, border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>👤 Profile</button>
+            <button onClick={onSignOut} style={{ background: 'white', color: '#7C3AED', padding: '8px 16px', borderRadius: 8, border: 'none', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}><LogOut size={16} /> Sign Out</button>
+          </div>
         </div>
       </header>
     </>
@@ -608,6 +605,7 @@ function Header({ onSignOut }) {
 
 // ── App ───────────────────────────────────────────────────────
 function MainApp() {
+  const navigate = useNavigate();
   const [currentUser, setCurrentUser] = useState(null);
   const [loading, setLoading]         = useState(true);
   const [showAuth, setShowAuth]       = useState(true);
@@ -698,7 +696,7 @@ function MainApp() {
         await uploadBytes(storageRef, photoFile);
         photoUrl = await getDownloadURL(storageRef);
       }
-      const ratingData = { rating, review, photo: photoUrl, timestamp: new Date().toISOString(), userId: currentUser.uid, itemId };
+      const ratingData = { rating, review, photo: photoUrl, timestamp: new Date().toISOString(), userId: currentUser.uid, itemId, itemName: items.find(i => i.id === itemId)?.name || itemId };
       await setDoc(doc(db, 'ratings', `${currentUser.uid}_${itemId}`), ratingData);
       const newRatings = { ...userRatings, [itemId]: ratingData };
       setUserRatings(newRatings);
@@ -880,7 +878,7 @@ return (
       <Route path="/profile" element={<ProfilePage currentUser={currentUser} />} />
       <Route path="/" element={
         <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
-          <Header onSignOut={handleSignOut} />
+          <Header onSignOut={handleSignOut} onProfile={() => navigate('/profile')} />
           <MainContent
             items={items}
             currentUser={currentUser}
