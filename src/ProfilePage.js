@@ -11,7 +11,7 @@ export default function ProfilePage({ currentUser }) {
   const [loading, setLoading] = useState(true);
   const [editingName, setEditingName] = useState(false);
   const [nameInput, setNameInput] = useState('');
-  const [displayName, setDisplayName] = useState('');
+  const [profileName, setProfileName] = useState('');
 
   useEffect(() => {
     if (!currentUser) {
@@ -19,7 +19,7 @@ export default function ProfilePage({ currentUser }) {
       return;
     }
     loadProfileData();
-    setDisplayName(currentUser.displayName || currentUser.email?.split('@')[0] || 'Disney Fan');
+    setProfileName(currentUser.displayName || currentUser.email?.split('@')[0] || 'Disney Fan');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentUser]);
 
@@ -60,7 +60,7 @@ export default function ProfilePage({ currentUser }) {
     if (!nameInput.trim()) return;
     try {
       await updateDoc(doc(db, 'users', currentUser.uid), { displayName: nameInput.trim() });
-      setDisplayName(nameInput.trim());
+      setProfileName(nameInput.trim());
       setEditingName(false);
     } catch (err) {
       console.error('Error saving name:', err);
@@ -241,8 +241,8 @@ export default function ProfilePage({ currentUser }) {
         </div>
       ) : (
         <div style={{ ...styles.displayName, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 8 }}>
-          {displayName}
-          <button onClick={() => { setNameInput(displayName); setEditingName(true); }} style={{ background: 'none', border: 'none', color: '#c9a84c', cursor: 'pointer', fontSize: '1rem', padding: 0 }}>✏️</button>
+          {profileName}
+          <button onClick={() => { setNameInput(profileName); setEditingName(true); }} style={{ background: 'none', border: 'none', color: '#c9a84c', cursor: 'pointer', fontSize: '1rem', padding: 0 }}>✏️</button>
         </div>
       )}
       <div style={styles.joinDate}>Member since {joinDate}</div>
