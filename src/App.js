@@ -317,7 +317,7 @@ function ItemDetailModal({ item, currentUser, userRatings, onRate, onClose }) {
                   {photoPreview && (
                     <img
                       src={photoPreview}
-                      alt="Preview"
+                      alt="Selected food"
                       style={{ marginTop: 10, width: '100%', maxHeight: 160, objectFit: 'cover', borderRadius: 8 }}
                     />
                   )}
