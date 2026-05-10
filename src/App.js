@@ -2,6 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom';
 import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom';
 import ProfilePage from './ProfilePage';
+import FindUsers from './FindUsers';
 import { LogOut } from 'lucide-react';
 
 // Firebase imports
@@ -583,7 +584,7 @@ function AuthScreen({ onSignIn, onSignUp }) {
 }
 
 // ── Header ────────────────────────────────────────────────────
-function Header({ onSignOut, onProfile }) {
+function Header({ onSignOut, onProfile, onFindUsers }) {
   return (
     <>
       <style>{`
@@ -595,6 +596,7 @@ function Header({ onSignOut, onProfile }) {
           <h1 className="disney-title" style={{ fontSize: 32, margin: 0 }}>🏰 Ask The Dishes</h1>
           <div style={{ display: 'flex', gap: 8 }}>
             <button onClick={onProfile} style={{ background: 'rgba(255,255,255,0.15)', color: 'white', padding: '8px 16px', borderRadius: 8, border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>👤 Profile</button>
+            <button onClick={onFindUsers} style={{ background: 'rgba(255,255,255,0.15)', color: 'white', padding: '8px 16px', borderRadius: 8, border: 'none', fontWeight: 600, cursor: 'pointer', fontSize: 14 }}>🔍 Find Users</button>
             <button onClick={onSignOut} style={{ background: 'white', color: '#7C3AED', padding: '8px 16px', borderRadius: 8, border: 'none', fontWeight: 600, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 6, fontSize: 14 }}><LogOut size={16} /> Sign Out</button>
           </div>
         </div>
@@ -876,9 +878,10 @@ function MainApp() {
 return (
     <Routes>
       <Route path="/profile" element={<ProfilePage currentUser={currentUser} />} />
+      <Route path="/find-users" element={<FindUsers currentUser={currentUser} />} />
       <Route path="/" element={
         <div style={{ minHeight: '100vh', background: '#F9FAFB' }}>
-          <Header onSignOut={handleSignOut} onProfile={() => navigate('/profile')} />
+          <Header onSignOut={handleSignOut} onProfile={() => navigate('/profile')} onFindUsers={() => navigate('/find-users')} />
           <MainContent
             items={items}
             currentUser={currentUser}
